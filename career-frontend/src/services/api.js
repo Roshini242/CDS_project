@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const BASE_URL = "/api";
 
 // ─── TOKEN HELPERS ────────────────────────────────────────────────────────────
 export const getToken = () => localStorage.getItem("careerdev_token");
@@ -10,10 +10,25 @@ export const api = async (endpoint, options = {}) => {
   const token = getToken();
   const headers = { "Content-Type": "application/json", ...options.headers };
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  const res = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Request failed");
-  return data;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === "AbortError") throw new Error("Request timed out. Is your backend running?");
+    throw err;
+  }
 };
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
@@ -52,9 +67,9 @@ export const Roadmap = {
 
 // ─── ASSESSMENT ───────────────────────────────────────────────────────────────
 export const Assessment = {
-  getAll:        ()          => api("/assessments"),
-  getById:       (id)        => api(`/assessments/${id}`),
-  submit:        (id, answers) => api(`/assessments/${id}/submit`, { method:"POST", body:JSON.stringify({ answers }) }),
-  getMyScores:   ()          => api("/assessments/my-scores"),
-  getLeaderboard:()          => api("/assessments/leaderboard"),
+  getAll: () => api("/assessments"),
+  getById: (id) => api(`/assessments/${id}`),
+  submit: (id, answers) => api(`/assessments/${id}/submit`, { method: "POST", body: JSON.stringify({ answers }) }),
+  getMyScores: () => api("/assessments/my-scores"),
+  getLeaderboard: () => api("/assessments/leaderboard"),
 };

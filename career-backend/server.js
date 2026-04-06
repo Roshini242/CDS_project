@@ -10,13 +10,14 @@ connectDB();
 
 const app = express();
 
-// ─── CORS FIX ─────────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: "*",                  // Allow all origins in development
-  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type","Authorization"],
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false,
 }));
+
+app.options("*", cors());
 
 // Handle preflight requests
 app.options("*", cors());
