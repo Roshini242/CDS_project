@@ -106,7 +106,7 @@ const guard = (p) => {
   };
 
   return (
-    <div style={{ background: "#0a0f1e", minHeight: "100vh" }}>
+    <div className="app-shell">
       <Navbar
         page={currentPage}
         setPage={setPage}
