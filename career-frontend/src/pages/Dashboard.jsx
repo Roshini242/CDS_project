@@ -35,7 +35,6 @@ export default function Dashboard({ user, setPage }) {
     { done: !!user.careerPath,                   text:"Choose a career path"               },
     { done: scores.length > 0,                   text:"Complete a skill assessment"        },
     { done: user.appliedJobs?.length > 0,        text:"Apply for a job or internship"      },
-    { done: !!user.profile?.resumeUrl,           text:"Upload your resume"                 },
   ];
 
   const completedCount = todos.filter(t => t.done).length;
